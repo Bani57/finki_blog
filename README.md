@@ -1,21 +1,3 @@
-# finki_blog
+# FinkiBlog
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
+Проект по Безбедност на компјутерски системи 2017/2018 - Андреј Јанчевски, Виктор Домазетоски
