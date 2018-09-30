@@ -26,7 +26,6 @@ class Database
 
         try {
             $this->conn = new PDO($dsn, $this->user, $this->pass, $this->options);
-            echo json_encode($this->conn);
         } catch (PDOException $exception) {
             echo json_encode("Connection error: " . $exception->getMessage());
         }

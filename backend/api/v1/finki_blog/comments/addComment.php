@@ -12,33 +12,33 @@ $db = $database->getConnection();
 
 $comment = json_decode(file_get_contents("php://input"));
 
-$q = $db->prepare("INSERT INTO Comment
+$q = $db->prepare(
+    "INSERT INTO Comment
       (
         user,
         post,
-        date,
+        `date`,
         content,
         likes
       )
        VALUES (
          :user,
          :post,
-         SYSDATE,
+         SYSDATE(),
          :content,
          0
        )"
      );
 
-$q->bindParam(":user", $comment->$user, PDO::PARAM_STR, 30);
-$q->bindParam(":post", $comment->$post, PDO::PARAM_INT, 10);
-$q->bindParam(":content", $comment->$content, PDO::PARAM_STR, 200);
+$q->bindParam(":user", $comment->user, PDO::PARAM_STR, 30);
+$q->bindParam(":post", $comment->post, PDO::PARAM_INT, 10);
+$q->bindParam(":content", $comment->content, PDO::PARAM_STR, 200);
 
 
 if ($q->execute()) {
     echo json_encode(true);
 } else {
-  echo json_encode(
+    echo json_encode(
  array('message' => 'Error while adding comment.', 'error' => $q->errorInfo() )
 );
 }
-?>
