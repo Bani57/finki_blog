@@ -25,14 +25,7 @@
         Clear
       </div>
       </div>
-      <div class="ui segments" style="width: 50%; margin: auto;">
-        <Post :id='1' author="Bani57" title="Test post" content="gsgsdg
-        afsasfasfgds
-        fsadfsdf" :date="moment().subtract(10,'minutes').fromNow()" :likes='3'></Post>
-          <div class="ui left aligned segment">
-            <button class="ui button" @click="deletePost(1)" >Delete post</button>
-          </div>
-      </div>
+      <Post @postDeleted="getPostsFromUser()" v-for="post in posts" :key="post.id" :id="post.id" :author="post.author" :title="post.title" :content="post.content" :date="post.date" :likes="post.likes"></Post>
     </div>
 </template>
 
@@ -114,10 +107,32 @@ export default Vue.extend({
       if (this.content)
         valid = valid && this.content.length <= 2000
       return valid
+    },
+    currentUser() {
+      return this.$store.state.currentUser;
     }
   },
   filters: {},
   methods: {
+    getPostsFromUser() {
+      let vm = this
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/getPostsFromUser.php?author=${this.currentUser.username}`, {
+        //credentials: 'include'
+      }).then(response => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          return Promise.reject(new Error('Failed getting posts.'))
+        }
+      }, reason => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Unable to fetch user posts. Try reloading', 'ERROR')
+        return Promise.reject(reason)
+      }).then(data => {
+        vm.posts = data
+        return data
+      })
+    },
     setContentRows() {
       var newLines = 0
       if (this.content)
@@ -130,15 +145,15 @@ export default Vue.extend({
           title: this.title,
           content: this.content
         }
-        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/addPost.php?username=Bani57`, {
+        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/addPost.php?username=${this.currentUser.username}`, {
           method: 'POST',
           body: JSON.stringify(post),
-          credentials: 'include',
+          //credentials: 'include',
         }).then((response) => {
           if (response.ok) {
             return response.json();
           } else {
-            return Promise.reject(new Error('Failed adding new post'));
+            return Promise.reject(new Error('Failed adding new post.'));
           }
         }, (reason) => {
           toastr.options.preventDuplicates = true;
@@ -147,34 +162,13 @@ export default Vue.extend({
         }).then((data) => {
           if (data) {
             toastr.options.preventDuplicates = true;
-            toastr.success('Post created.', 'SUCCESS')
+            toastr.success('Post created.', 'SUCCESS');
+            this.clearPostFields();
+            this.getPostsFromUser();
           }
           return data;
         });
-        this.clearPostFields()
       }
-    },
-    deletePost(id) {
-      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/deletePost.php?id=${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      }).then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return Promise.reject(new Error('Failed deleting post'));
-        }
-      }, (reason) => {
-        toastr.options.preventDuplicates = true;
-        toastr.error('Failed deleting post.', 'ERROR');
-        return Promise.reject(reason);
-      }).then((data) => {
-        if (data) {
-          toastr.options.preventDuplicates = true;
-          toastr.success('Post deleted.', 'SUCCESS')
-        }
-        return data;
-      });
     },
     clearPostFields() {
       this.title = null
@@ -188,23 +182,9 @@ export default Vue.extend({
     }
   },
   mounted() {
-    let vm = this
-    fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/getPostsFromUser.php?username=Bani57`, {
-      credentials: 'include'
-    }).then(response => {
-      if (response.ok) {
-        return response.json()
-      } else {
-        return Promise.reject(new Error('Failed getting posts'))
-      }
-    }, reason => {
-      toastr.options.preventDuplicates = true;
-      toastr.error('Unable to fetch user posts. Try reloading', 'ERROR')
-      return Promise.reject(reason)
-    }).then(data => {
-      vm.posts = data
-      return data
-    })
+    if (!this.currentUser)
+      window.location.href = "http://localhost:8081/finki_blog/"
+    this.getPostsFromUser()
   },
 });
 </script>
