@@ -49,10 +49,11 @@
             Clear
           </div>
           </div>
-            <Comment author="Rashantal" :post='1' content="Nice post" :date="moment().subtract(5,'minutes').fromNow()" :likes='2'></Comment>
-            <Comment author="Bani57" :post='1' content="Thanks <3" :date="moment().subtract(3,'minutes').fromNow()" :likes='1'></Comment>
-            <Comment author="MakedonciNaInternet" :post='1' content="BOJKOT" :date="moment().subtract(1,'minutes').fromNow()" :likes='0'></Comment>
+          <Comment @commentDeleted="getCommentsFromPost()" v-for="comment in comments" :key="comment.date" :author="comment.user" :post="comment.post" :content="comment.content" :date="comment.date" :likes="comment.likes"></Comment>
     </div>
+  </div>
+  <div class="ui left aligned grey segment" v-if="this.author==currentUser.username">
+    <button class="ui button" @click="deletePost()">Delete post</button>
   </div>
 </div>
 </template>
@@ -106,6 +107,7 @@ export default {
       liked: false,
       commentContent: null,
       comments: null,
+      dateDisplay: moment(this.date).fromNow(),
     }
   },
   components: {
@@ -117,14 +119,42 @@ export default {
       if (this.commentContent)
         valid = valid && this.commentContent.length <= 200
       return valid
+    },
+    currentUser() {
+      return this.$store.state.currentUser;
     }
   },
   methods: {
+    getCommentsFromPost() {
+      let vm = this
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/getCommentsFromPost.php?post=${this.id}`, {
+        //credentials: 'include'
+      }).then(response => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          return Promise.reject(new Error('Failed getting comments.'))
+        }
+      }, reason => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Unable to fetch comments. Try reloading', 'ERROR')
+        return Promise.reject(reason)
+      }).then(data => {
+        vm.comments = data
+        return data
+      })
+    },
     setUserImage() {
-      var images = require.context('@/assets/', false)
-      if (this.authorAccount)
+      var images = require.context('@/assets/', true)
+      if (this.authorAccount && this.authorAccount.picture)
         return images('./users/' + this.authorAccount.picture)
       else return images('./user.png')
+    },
+    setDateDisplay(relative) {
+      if (relative)
+        this.dateDisplay = moment(this.date).fromNow();
+      else
+        this.dateDisplay = moment(this.date).format("DD MMMM YYYY HH:mm:ss");
     },
     likePost() {
       if (!this.liked)
@@ -144,19 +174,19 @@ export default {
     addComment() {
       if (this.validComment) {
         var comment = {
-          user: this.author,
+          user: this.currentUser.username,
           post: this.id,
           content: this.commentContent
         }
-        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/addComment.php`, {
+        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/addComment.php`, {
           method: 'POST',
           body: JSON.stringify(comment),
-          credentials: 'include',
+          //credentials: 'include',
         }).then((response) => {
           if (response.ok) {
             return response.json();
           } else {
-            return Promise.reject(new Error('Failed adding new comment on post'));
+            return Promise.reject(new Error('Failed adding new comment on post.'));
           }
         }, (reason) => {
           toastr.options.preventDuplicates = true;
@@ -165,52 +195,65 @@ export default {
         }).then((data) => {
           if (data) {
             toastr.options.preventDuplicates = true;
-            toastr.success('Comment added.', 'SUCCESS')
+            toastr.success('Comment added.', 'SUCCESS');
+            this.clearCommentFields();
+            this.getCommentsFromPost();
           }
           return data;
         });
-        this.clearCommentFields()
       }
     },
     clearCommentFields() {
       this.commentContent = null
     },
+    deletePost() {
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/deletePost.php?id=${this.id}`, {
+        method: 'DELETE',
+        //credentials: 'include',
+      }).then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return Promise.reject(new Error('Failed deleting post.'));
+        }
+      }, (reason) => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Failed deleting post.', 'ERROR');
+        return Promise.reject(reason);
+      }).then((data) => {
+        if (data) {
+          toastr.options.preventDuplicates = true;
+          toastr.success('Post deleted.', 'SUCCESS');
+          this.$emit('postDeleted');
+        }
+        return data;
+      });
+    },
   },
   mounted() {
     $(this.$refs.commentsAccordion).accordion('refresh');
     let vm = this
-    fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.author}`, {
-      credentials: 'include'
-    }).then(response => {
-      if (response.ok) {
-        return response.json()
-      } else {
-        return Promise.reject(new Error('Failed getting user'))
-      }
-    }, reason => {
-      toastr.options.preventDuplicates = true;
-      toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
-      return Promise.reject(reason)
-    }).then(data => {
-      vm.authorAccount = data
-      return data
-    })
-    fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/getCommentsFromPost.php?id=${this.id}`, {
-      credentials: 'include'
-    }).then(response => {
-      if (response.ok) {
-        return response.json()
-      } else {
-        return Promise.reject(new Error('Failed getting comments.'))
-      }
-    }, reason => {
-      toastr.options.preventDuplicates = true;
-      toastr.error('Unable to fetch comments. Try reloading', 'ERROR')
-      return Promise.reject(reason)
-    }).then(data => {
-      vm.comments = data
-      return data
-    })
+    if (this.$store.state.allUsers[this.author])
+      this.authorAccount = this.$store.state.allUsers[this.author]
+    else {
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.author}`, {
+        //credentials: 'include'
+      }).then(response => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          return Promise.reject(new Error('Failed getting user.'))
+        }
+      }, reason => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
+        return Promise.reject(reason)
+      }).then(data => {
+        vm.authorAccount = data
+        return data
+      })
+    }
+    this.getCommentsFromPost()
   }
 }
 </script>
