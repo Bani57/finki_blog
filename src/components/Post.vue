@@ -1,12 +1,12 @@
 <template>
-<div class="ui segments">
-  <div class="ui left aligned segment">
+<div class="ui segments" style="width: 50%; margin: auto;">
+  <div class="ui left aligned blue segment">
     <div class="ui header">
-      <img class="ui circular image" :src="setUserImage()"/>
+      <img class="ui circular image" :src="setUserImage()" style="width: 3em; height: 3em;" />
       <div class="content">
         {{this.author}}
-        <div class="sub header">
-          {{this.date}}
+        <div class="sub header" @mouseover="setDateDisplay(false)" @mouseleave="setDateDisplay(true)">
+          {{dateDisplay}}
         </div>
       </div>
     </div>
@@ -40,7 +40,7 @@
         <div class="ui error message"></div>
         <div class="required field">
           <label>Content</label>
-          <textarea name="commentContent" v-model="commentContent" :rows="setContentRows()" placeholder="What do you think?" style="font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;"/>
+          <textarea name="commentContent" v-model="commentContent" :rows="setContentRows()" placeholder="What do you think?" style="font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;" />
           </div>
           <div @click="addComment()" class="ui blue submit button field">
             Comment

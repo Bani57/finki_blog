@@ -7,11 +7,11 @@
     <div class="ui error message"></div>
     <div class="required field">
       <label>Title</label>
-      <input type="text" name="title" v-model="title" placeholder="Give a name to your post!"/>
+      <input type="text" name="title" v-model="title" placeholder="Give a name to your post!" />
     </div>
-      <div class="required field">
-        <label>Content</label>
-        <textarea name="content" v-model="content" :rows="setContentRows()" placeholder="What's on your mind today?" style="font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;"/>
+    <div class="required field">
+      <label>Content</label>
+      <textarea name="content" v-model="content" :rows="setContentRows()" placeholder="What's on your mind today?" style="font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;" />
       </div>
       <div class="required field">
         <label>Captcha</label>

@@ -1,12 +1,12 @@
 <template>
 <div class="ui segments">
-  <div class="ui left aligned segment">
+  <div class="ui left aligned red segment">
     <div class="ui header">
-      <img class="ui circular image" :src="setUserImage()"/>
+      <img class="ui circular image" :src="setUserImage()" style="width: 3em; height: 3em;" />
       <div class="content">
         {{this.author}}
-        <div class="sub header">
-          {{this.date}}
+        <div class="sub header" @mouseover="setDateDisplay(false)" @mouseleave="setDateDisplay(true)">
+          {{dateDisplay}}
         </div>
       </div>
     </div>
