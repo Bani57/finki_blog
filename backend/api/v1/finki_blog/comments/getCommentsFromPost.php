@@ -13,7 +13,7 @@ $db = $database->getConnection();
 
 $post = isset($_GET['post']) ? $_GET['post'] : die();
 
-$q = $db->prepare("SELECT * FROM Comment WHERE post = :post ORDER BY date DESC");
+$q = $db->prepare("SELECT * FROM Comment WHERE post = :post ORDER BY `date` DESC");
 $q->bindParam(":post", $post, PDO::PARAM_INT, 10);
 
 

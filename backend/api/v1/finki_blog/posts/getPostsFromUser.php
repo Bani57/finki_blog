@@ -13,7 +13,7 @@ $db = $database->getConnection();
 
 $author = isset($_GET['author']) ? $_GET['author'] : die();
 
-$q = $db->prepare("SELECT * FROM Post WHERE author = :author ORDER BY date DESC");
+$q = $db->prepare("SELECT * FROM Post WHERE author = :author ORDER BY `date` DESC");
 $q->bindParam(":author", $author, PDO::PARAM_STR, 30);
 
 
