@@ -9,11 +9,24 @@
     <div @click="logout()" class="huge ui blue button" style="margin-top: 50px; margin-right: 50px">
       Logout
     </div>
+    <div @click="showDeleteAccountModal()" class="huge ui blue button" style="margin-top: 50px">
+      Delete account
+    </div>
+    <div class="ui mini modal" ref="deleteAccountModal">
+      <div class="header">Are you sure?</div>
+      <div class="content">
+        You won't be able to revert this.
+      </div>
+      <div class="actions">
+        <div class="ui green approve button">Yes</div>
+        <div class="ui red cancel button">No</div>
+      </div>
+    </div>
   </div>
   <div v-else style="margin-top: 30px">
     <div class="ui huge header">
       Welcome to the FINKI blog site!
-      <div class="sub header" style="margin-top: 20px">To proceed please Login if you already have an account or click Register to join the community!</div>
+      <div class="sub header" style="margin-top: 20px">To proceed please <b>Login</b> if you already have an account or click <b>Register</b> to join the community!</div>
     </div>
     <div @click="showLoginForm()" class="huge ui blue button" style="margin-top: 50px; margin-right: 50px">
       Login
@@ -299,6 +312,15 @@ export default Vue.extend({
         inline: true
       }).modal('show');
     },
+    showDeleteAccountModal() {
+      let vm = this
+      $(this.$refs.deleteAccountModal).modal({
+        inline: true,
+        onApprove: function() {
+          vm.deleteUser()
+        }
+      }).modal('show');
+    },
     login() {
       if (this.validLogin) {
         this.$store.dispatch('setCurrentUser', this.username); // Final command before complete login.
@@ -312,6 +334,30 @@ export default Vue.extend({
       this.$store.commit('SET_CURRENT_USER', null);
       toastr.options.preventDuplicates = true;
       toastr.success('Logout successful. Bye bye!', 'SUCCESS');
+    },
+    deleteUser() {
+      let vm = this
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/deleteUser.php?username=${this.currentUser.username}`, {
+        method: 'DELETE',
+        //credentials: 'include',
+      }).then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return Promise.reject(new Error('Failed deleting user account.'));
+        }
+      }, (reason) => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Failed deleting user account.', 'ERROR');
+        return Promise.reject(reason);
+      }).then((data) => {
+        if (data) {
+          toastr.options.preventDuplicates = true;
+          toastr.success('Goodbye ' + vm.currentUser.username + '!', 'SUCCESS');
+          this.$store.commit('SET_CURRENT_USER', null);
+        }
+        return data;
+      });
     },
     clearLoginFields() {
       this.username = null
@@ -372,6 +418,7 @@ export default Vue.extend({
   beforeDestroy: function() {
     $(this.$refs.loginModal).modal('hide');
     $(this.$refs.registerModal).modal('hide');
+    $(this.$refs.deleteAccountModal).modal('hide');
   },
 });
 </script>
