@@ -14,6 +14,9 @@ export default Vue.extend({
   components: {
     NavBar,
   },
+  mounted() {
+    this.$store.dispatch('getAllUsers')
+  },
 });
 </script>
 

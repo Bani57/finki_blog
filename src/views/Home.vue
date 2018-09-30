@@ -1,102 +1,116 @@
 <template>
 <div class="home">
   <img src="@/assets/logo.png" class="ui centered medium image">
-  <div class="ui huge header">
-    Welcome to the FINKI blog site!
-    <div class="sub header" style="margin-top: 20px">To proceed please Login if you already have an account or click Register to join the community!</div>
+  <div v-if="currentUser" style="margin-top: 30px">
+    <div class="ui huge header">
+      {{'Welcome, '+ currentUser.username + '!'}}
+      <div class="sub header" style="margin-top: 20px">Click on <b>My posts</b> to make a new post or see if anyone has commented on your previous posts, or just go to <b>Dashboard</b> to see what others have to say.</div>
+    </div>
+    <div @click="logout()" class="huge ui blue button" style="margin-top: 50px; margin-right: 50px">
+      Logout
+    </div>
   </div>
-  <div @click="showLoginForm()" class="huge ui blue button" style="margin-top: 50px; margin-right: 50px">
-    Login
-  </div>
-  <div class="ui modal" ref="loginModal">
-    <div class="header">
+  <div v-else style="margin-top: 30px">
+    <div class="ui huge header">
+      Welcome to the FINKI blog site!
+      <div class="sub header" style="margin-top: 20px">To proceed please Login if you already have an account or click Register to join the community!</div>
+    </div>
+    <div @click="showLoginForm()" class="huge ui blue button" style="margin-top: 50px; margin-right: 50px">
       Login
     </div>
-    <div class="content">
-      <div class="ui login form">
-        <div class="ui error message"></div>
-        <input type="hidden" name="correctUsername" v-model="correctUsername" />
-        <input type="hidden" name="correctPasswordHash" v-model="correctPasswordHash" />
-        <div class="required field">
-          <label>Username</label>
-          <input type="text" name="username" v-model="username" placeholder="Enter username here..."/>
-        </div>
+    <div class="ui modal" ref="loginModal">
+      <div class="header">
+        Login
+      </div>
+      <div class="content">
+        <div class="ui login form">
+          <div class="ui error message"></div>
+          <input type="hidden" name="correctUsername" v-model="correctUsername" />
+          <input type="hidden" name="correctPasswordHash" v-model="correctPasswordHash" />
+          <div class="required field">
+            <label>Username</label>
+            <input type="text" name="username" v-model="username" placeholder="Enter username here..." />
+          </div>
           <div class="required field">
             <label>Password</label>
-            <input type="password" name="password" v-model="password" placeholder="Enter password here..."/>
+            <input type="password" name="password" v-model="password" placeholder="Enter password here..." />
           </div>
-            <div @click="login()" class="ui blue submit button field">
-              Login
-            </div>
-            <div @click="clearLoginFields()" class="ui clear button field" style="margin-left: 15px">
-              Clear
-            </div>
+          <div @click="login()" class="ui blue submit button field">
+            Login
           </div>
-        </div>
-      </div>
-      <div @click="showRegisterForm()" class="huge ui blue button" style="margin-top: 50px">
-        Register
-      </div>
-      <div class="ui modal" ref="registerModal">
-        <div class="header">
-          Register
-        </div>
-        <div class="content">
-          <form class="ui register form" enctype="multipart/form-data">
-            <div class="ui error message"></div>
-            <div class="required field">
-              <label>Username</label>
-              <input type="text" name="usernameRegistration" v-model="usernameRegistration" placeholder="Enter a username here..."/>
-            </div>
-              <div class="required field">
-                <label>Password</label>
-                <input type="password" name="passwordRegistration" v-model="passwordRegistration" placeholder="Enter a password here..."/>
-              </div>
-                <div class="two fields">
-                  <div class="field">
-                    <label>First name</label>
-                    <input type="text" name="firstName" v-model="firstName" placeholder="Enter your first name here..."/>
-                </div>
-                    <div class="field">
-                      <label>Last name</label>
-                      <input type="text" name="lastName" v-model="lastName" placeholder="Enter your last name here..."/>
-                </div>
-                    </div>
-                    <div class="field">
-                      <label>Email</label>
-                      <input type="email" name="email" v-model="email" placeholder="Enter your email address here..."/>
-                    </div>
-                      <div class="field">
-                        <label>Profile picture</label>
-                        <input type="hidden" name="pictureName" v-model="pictureName" />
-                        <input type="file" name="pictureUpload" @change="filesChange($event.target.files)" accept="image/*"/>
-                    </div>
-                        <div @click="register()" class="ui blue submit button field">
-                          Register
-                        </div>
-                        <div @click="clearRegisterFields()" class="ui clear button field" style="margin-left: 15px">
-                          Clear
-                        </div>
-          </form>
-        </div>
-      </div>
-
-      <div class="ui footer segments">
-        <div class="ui vertical segment">
-          <div>
-            Icons made by <a href="https://www.flaticon.com/authors/monkik" title="monkik">monkik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
-          </div>
-          <div>
-            Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
-          </div>
-        </div>
-        <div class="ui vertical segment">
-          <div>
-            <span class="text">Faculty of Computer Science and Engineering - Skopje 2018</span>
+          <div @click="clearLoginFields()" class="ui clear button field" style="margin-left: 15px">
+            Clear
           </div>
         </div>
       </div>
     </div>
+    <div @click="showRegisterForm()" class="huge ui blue button" style="margin-top: 50px">
+      Register
+    </div>
+    <div class="ui modal" ref="registerModal">
+      <div class="header">
+        Register
+      </div>
+      <div class="content">
+        <form class="ui register form" enctype="multipart/form-data">
+          <div class="ui error message"></div>
+          <div class="required field">
+            <label>Username</label>
+            <input type="text" name="usernameRegistration" v-model="usernameRegistration" placeholder="Enter a username here..." />
+          </div>
+          <div class="required field">
+            <label>Password</label>
+            <input type="password" name="passwordRegistration" v-model="passwordRegistration" placeholder="Enter a password here..." />
+          </div>
+          <div class="two fields">
+            <div class="field">
+              <label>First name</label>
+              <input type="text" name="firstName" v-model="firstName" placeholder="Enter your first name here..." />
+            </div>
+            <div class="field">
+              <label>Last name</label>
+              <input type="text" name="lastName" v-model="lastName" placeholder="Enter your last name here..." />
+            </div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" v-model="email" placeholder="Enter your email address here..." />
+          </div>
+          <div class="field">
+            <label>Profile picture</label>
+            <input type="hidden" name="pictureName" v-model="pictureName" />
+            <input type="file" name="pictureUpload" @change="filesChange($event.target.files)" accept="image/*" />
+          </div>
+          <div @click="register()" class="ui blue submit button field">
+            Register
+          </div>
+          <div @click="clearRegisterFields()" class="ui clear button field" style="margin-left: 15px">
+            Clear
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="ui footer segments">
+    <div class="ui vertical segment">
+      <div>
+        Icons made by <a href="https://www.flaticon.com/authors/monkik" title="monkik">monkik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"
+          title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+      </div>
+      <div>
+        Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"
+          title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+      </div>
+    </div>
+    <div class="ui vertical segment">
+      <div>
+        <span class="text">Faculty of Computer Science and Engineering - Skopje 2018</span>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script lang="ts">
@@ -222,8 +236,36 @@ export default Vue.extend({
     }
   },
   computed: {
+    currentUser() {
+      return this.$store.state.currentUser;
+    },
     validLogin() {
-      return this.username && this.password
+      let vm = this
+      if (vm.$store.state.allUsers[this.username]) {
+        vm.correctUsername = vm.$store.state.allUsers[this.username].username
+        vm.correctPasswordHash = vm.$store.state.allUsers[this.username].password
+      } else {
+        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.username}`, {
+          //credentials: 'include'
+        }).then(response => {
+          if (response.ok) {
+            return response.json()
+          } else {
+            return Promise.reject(new Error('Failed getting user'))
+          }
+        }, reason => {
+          toastr.options.preventDuplicates = true;
+          toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
+          return Promise.reject(reason)
+        }).then(data => {
+          if (data) {
+            vm.correctUsername = data.username
+            vm.correctPasswordHash = data.password
+          }
+          return data
+        })
+      }
+      return this.username && this.password && vm.correctUsername == vm.username && vm.correctPasswordHash == vm.passwordHash(vm.password)
     },
     validRegistration() {
       var valid = this.usernameRegistration && this.passwordRegistration
@@ -259,35 +301,23 @@ export default Vue.extend({
     },
     login() {
       if (this.validLogin) {
-        let vm = this
-        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.username}`, {
-          credentials: 'include'
-        }).then(response => {
-          if (response.ok) {
-            return response.json()
-          } else {
-            return Promise.reject(new Error('Failed getting user'))
-          }
-        }, reason => {
-          toastr.options.preventDuplicates = true;
-          toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
-          return Promise.reject(reason)
-        }).then(data => {
-          vm.correctUsername = data.username
-          vm.correctPasswordHash = data.password
-          return data
-        })
-        var loginOk = vm.correctUsername == vm.username && vm.correctPasswordHash == vm.passwordHash(vm.password)
-        if (loginOk) {
-          $(this.$refs.loginModal).modal('hide');
-          this.clearLoginFields();
-          console.log("SUCCESSFUL LOGIN!")
-        }
+        this.$store.dispatch('setCurrentUser', this.username); // Final command before complete login.
+        $(this.$refs.loginModal).modal('hide');
+        this.clearLoginFields();
+        toastr.options.preventDuplicates = true;
+        toastr.success('You are now logged in!', 'SUCCESS');
       }
+    },
+    logout() {
+      this.$store.commit('SET_CURRENT_USER', null);
+      toastr.options.preventDuplicates = true;
+      toastr.success('Logout successful. Bye bye!', 'SUCCESS');
     },
     clearLoginFields() {
       this.username = null
       this.password = null
+      this.correctUsername = null
+      this.correctPasswordHash = null
     },
     filesChange(filesList) {
       var image = filesList[0]
@@ -305,21 +335,21 @@ export default Vue.extend({
           email: vm.email,
           picture: vm.pictureName
         }
-        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/addUser.php`, {
+        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/addUser.php`, {
           method: 'POST',
           body: JSON.stringify(user),
-          credentials: 'include',
-        }).then((response) => {
+          //credentials: 'include',
+        }).then(response => {
           if (response.ok) {
             return response.json();
           } else {
             return Promise.reject(new Error('Failed adding new user'));
           }
-        }, (reason) => {
+        }, reason => {
           toastr.options.preventDuplicates = true;
           toastr.error('Failed adding new user.', 'ERROR');
           return Promise.reject(reason);
-        }).then((data) => {
+        }).then(data => {
           if (data) {
             toastr.options.preventDuplicates = true;
             toastr.success('User account created.', 'SUCCESS')

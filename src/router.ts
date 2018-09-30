@@ -14,14 +14,16 @@ export default new Router({
       component: Home
     },
     {
-      path: '/myposts',
-      name: 'myposts',
-      component: MyPosts
+      path: '/myposts/:user',
+      name: 'MyPosts',
+      component: MyPosts,
+      props: route => ({ currentUser: route.params.user }),
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: Dashboard
+      path: '/dashboard/:user',
+      name: 'Dashboard',
+      component: Dashboard,
+      props: route => ({ currentUser: route.params.user }),
     },
   ]
 })
