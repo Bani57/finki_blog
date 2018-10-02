@@ -1,12 +1,12 @@
 <template>
 <div class="dashboard">
   <div style="width: 50%; margin: auto;">
-    <div class="ui search selection dropdown" ref="followingDropdown" style="width: 80%;">
+    <div class="ui search selection dropdown" ref="followingDropdown" :style="{width: userToFollow ? '80%' : '100%'}">
       <input type="hidden" name="userToFollow" />
       <i class="dropdown icon"></i>
       <div class="default text">Find a user to follow...</div>
       <div class="menu">
-        <div class="item" @click="setUserToFollow(user.username)" v-for="user in allUsers" v-if="user.username!=currentUser.username">
+        <div class="item" @click="setUserToFollow(user.username)" :key="user.username" v-for="user in allUsers" v-if="user.username!=currentUser.username">
           <span class="text">{{user.username}}</span>
         </div>
       </div>
