@@ -189,6 +189,12 @@ export default Vue.extend({
       window.location.href = "http://localhost:8081/finki_blog/"
     this.getPostsFromUser()
   },
+  beforeRouteUpdate(to, from, next) {
+    if (to.params.user != this.currentUser.username) {
+      toastr.options.preventDuplicates = true;
+      toastr.error('Don\'t even think about doing that.', 'ERROR');
+    } else next();
+  },
 });
 </script>
 

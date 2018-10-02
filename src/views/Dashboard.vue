@@ -165,6 +165,12 @@ export default Vue.extend({
     this.getFollowedUsers()
     this.getPostsFromFollowedUsers()
   },
+  beforeRouteUpdate(to, from, next) {
+    if (to.params.user != this.currentUser.username) {
+      toastr.options.preventDuplicates = true;
+      toastr.error('Don\'t even think about doing that.', 'ERROR');
+    } else next();
+  },
 });
 </script>
 
