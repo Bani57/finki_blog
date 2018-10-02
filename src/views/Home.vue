@@ -97,7 +97,7 @@
           <div @click="register()" class="ui blue submit button field">
             Register
           </div>
-          <div @click="clearRegisterFields()" class="ui clear button field" style="margin-left: 15px">
+          <div @click="clearRegisterFields()" class="ui button field" style="margin-left: 15px">
             Clear
           </div>
         </form>
@@ -242,7 +242,7 @@ export default Vue.extend({
       passwordRegistration: null,
       firstName: null,
       lastName: null,
-      email: null,
+      email: "username@example.com",
       pictureName: null,
       correctUsername: null,
       correctPasswordHash: null,
@@ -373,6 +373,8 @@ export default Vue.extend({
     register() {
       var vm = this
       if (this.validRegistration) {
+        if (this.email == "username@example.com")
+          this.email = null
         var user = {
           username: vm.usernameRegistration,
           password: vm.passwordHash(vm.passwordRegistration),
@@ -398,7 +400,8 @@ export default Vue.extend({
         }).then(data => {
           if (data) {
             toastr.options.preventDuplicates = true;
-            toastr.success('User account created.', 'SUCCESS')
+            toastr.success('User account created.', 'SUCCESS');
+            vm.email = "username@example.com";
           }
           return data;
         });
@@ -411,7 +414,7 @@ export default Vue.extend({
       this.passwordRegistration = null
       this.firstName = null
       this.lastName = null
-      this.email = null
+      this.email = "username@example.com"
       this.pictureName = null
     },
   },
