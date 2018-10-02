@@ -17,7 +17,7 @@
   <div class="ui right aligned segment">
     <div class="ui left labeled button" tabindex="0">
       <div class="ui basic label">
-        {{this.liked ? (this.likes + 1) : this.likes}}
+        {{this.likes}}
       </div>
       <div class="ui icon button" :class="this.liked ? 'blue' : ''" @click="likeComment()">
         <i class="thumbs up icon"></i>
@@ -71,11 +71,37 @@ export default {
       else
         this.dateDisplay = moment(this.date).format("DD MMMM YYYY HH:mm:ss");
     },
+    updateCommentLikes(amount) {
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/updateCommentLikes.php?user=${this.author}&post=${this.post}&date=${this.date}&amount=${amount}`, {
+        method: 'PATCH',
+        //credentials: 'include',
+      }).then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return Promise.reject(new Error('Failed updating likes.'));
+        }
+      }, (reason) => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Failed updating likes.', 'ERROR');
+        return Promise.reject(reason);
+      }).then((data) => {
+        if (data) {
+          toastr.options.preventDuplicates = true;
+          toastr.success('Likes updated.', 'SUCCESS');
+          this.$emit('commentDeleted');
+        }
+        return data;
+      });
+    },
     likeComment() {
-      if (!this.liked)
+      if (!this.liked) {
         this.liked = true
-      else
+        this.updateCommentLikes(this.likes + 1)
+      } else {
         this.liked = false
+        this.updateCommentLikes(this.likes - 1)
+      }
     },
     deleteComment() {
       let vm = this

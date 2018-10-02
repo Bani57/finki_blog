@@ -20,7 +20,7 @@
   <div class="ui right aligned segment">
     <div class="ui left labeled button" tabindex="0">
       <div class="ui basic label">
-        {{this.liked ? (this.likes + 1) : this.likes}}
+        {{this.likes}}
       </div>
       <div class="ui icon button" :class="this.liked ? 'blue' : ''" @click="likePost()">
         <i class="thumbs up icon"></i>
@@ -156,11 +156,37 @@ export default {
       else
         this.dateDisplay = moment(this.date).format("DD MMMM YYYY HH:mm:ss");
     },
+    updatePostLikes(amount) {
+      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/updatePostLikes.php?id=${this.id}&amount=${amount}`, {
+        method: 'PATCH',
+        //credentials: 'include',
+      }).then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return Promise.reject(new Error('Failed updating likes.'));
+        }
+      }, (reason) => {
+        toastr.options.preventDuplicates = true;
+        toastr.error('Failed updating likes.', 'ERROR');
+        return Promise.reject(reason);
+      }).then((data) => {
+        if (data) {
+          toastr.options.preventDuplicates = true;
+          toastr.success('Likes updated.', 'SUCCESS');
+          this.$emit('postDeleted');
+        }
+        return data;
+      });
+    },
     likePost() {
-      if (!this.liked)
+      if (!this.liked) {
         this.liked = true
-      else
+        this.updatePostLikes(this.likes + 1)
+      } else {
         this.liked = false
+        this.updatePostLikes(this.likes - 1)
+      }
     },
     refreshAccordion() {
       $(this.$refs.commentsAccordion).accordion('refresh');
