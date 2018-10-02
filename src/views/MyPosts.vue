@@ -16,7 +16,7 @@
       <div class="required field">
         <label>Captcha</label>
         <input type="hidden" name="captcha" v-model="captchaCorrect" />
-        <my-captcha :callSuccess="captchaOk" color="green" mode="text" resolve="text" class="captcha"></my-captcha>
+        <my-captcha :callSuccess="captchaOk" color="green" mode="text" resolve="text" class="captcha" ref="captcha"></my-captcha>
       </div>
       <div @click="makePost()" class="ui blue submit button field">
         Post
@@ -175,7 +175,10 @@ export default Vue.extend({
       this.content = null
       this.showCaptcha = false
       this.captchaCorrect = null
-      //location.reload()
+      this.$refs.captcha.picture()
+      this.$refs.captcha.auth = false
+      this.$refs.captcha.success = 0
+      this.$refs.captcha.text = null
     },
     captchaOk() {
       this.captchaCorrect = 'OK'
