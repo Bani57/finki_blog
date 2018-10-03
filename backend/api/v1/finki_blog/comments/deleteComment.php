@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://localhost");
 header("Access-Control-Allow-Headers: access");
 header("Access-Control-Allow-Methods: DELETE");
 header("Access-Control-Allow-Credentials: true");
