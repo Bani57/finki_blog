@@ -371,15 +371,16 @@ export default Vue.extend({
       this.correctPasswordHash = null
     },
     filesChange(filesList) {
-      var image = filesList[0]
-      this.pictureName = image.name
-      // Add file upload code here
+      var imageFile = filesList[0]
+      this.image = imageFile
+      this.pictureName = imageFile.name
     },
     register() {
       var vm = this
       if (this.validRegistration) {
-        if (this.email == "username@example.com")
+        if (this.email === 'username@example.com') {
           this.email = null
+        }
         var user = {
           username: vm.usernameRegistration,
           password: vm.passwordHash(vm.passwordRegistration),
@@ -388,30 +389,55 @@ export default Vue.extend({
           email: vm.email,
           picture: vm.pictureName
         }
-        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/addUser.php`, {
+        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/addUser.php`, {
           method: 'POST',
           body: JSON.stringify(user),
-          //credentials: 'include',
+          credentials: 'include'
         }).then(response => {
           if (response.ok) {
-            return response.json();
+            return response.json()
           } else {
-            return Promise.reject(new Error('Failed adding new user'));
+            return Promise.reject(new Error('Failed adding new user'))
           }
         }, reason => {
-          toastr.options.preventDuplicates = true;
-          toastr.error('Failed adding new user.', 'ERROR');
-          return Promise.reject(reason);
+          toastr.options.preventDuplicates = true
+          toastr.error('Failed adding new user.', 'ERROR')
+          return Promise.reject(reason)
         }).then(data => {
           if (data) {
-            toastr.options.preventDuplicates = true;
-            toastr.success('User account created.', 'SUCCESS');
-            vm.email = "username@example.com";
+            toastr.options.preventDuplicates = true
+            toastr.success('User account created.', 'SUCCESS')
+            vm.email = 'username@example.com'
           }
-          return data;
-        });
-        $(this.$refs.registerModal).modal('hide');
-        this.clearRegisterFields();
+          return data
+        })
+        let formData = new FormData()
+        if (this.image) {
+          formData.append('fileToUpload', this.image)
+          fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/uploadPicture.php`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+          }).then(response => {
+            if (response.ok) {
+              return response.json()
+            } else {
+              return Promise.reject(new Error('Failed uploading picture.'))
+            }
+          }, reason => {
+            toastr.options.preventDuplicates = true
+            toastr.error('Failed uploading picture.', 'ERROR')
+            return Promise.reject(reason)
+          }).then(data => {
+            if (data) {
+              toastr.options.preventDuplicates = true
+              toastr.success('Profile picture uploaded.', 'SUCCESS')
+            }
+            return data
+          })
+        }
+        $(this.$refs.registerModal).modal('hide')
+        this.clearRegisterFields()
       }
     },
     clearRegisterFields() {
