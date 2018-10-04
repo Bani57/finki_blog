@@ -41,7 +41,7 @@ $q->bindParam(":email", $user->email, PDO::PARAM_STR, 50);
 $q->bindParam(":picture", $user->picture, PDO::PARAM_STR, 100);
 
 if ($q->execute()) {
-    echo json_encode($user->username);
+    echo json_encode(shell_exec('bash /home/Bani57/root/ca/GEZOPO/createUserCertificate.sh ' . $user->username . ' ' . $user->password));
 } else {
     echo json_encode(
  array('message' => 'Error while adding user.', 'error' => $q->errorInfo() )
