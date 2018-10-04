@@ -18,21 +18,21 @@ import moment from 'moment'
 
 export default {
   name: 'NavBar',
-  data() {
+  data () {
     return {
       moment: moment
     }
   },
   components: {},
   computed: {
-    currentDate() {
-      return moment().format("DD.MM.YYYY");
+    currentDate () {
+      return moment().format('DD.MM.YYYY')
     },
-    currentUser() {
-      return this.$store.state.currentUser;
-    },
+    currentUser () {
+      return this.$store.state.currentUser
+    }
   },
-  methods: {},
+  methods: {}
 }
 </script>
 

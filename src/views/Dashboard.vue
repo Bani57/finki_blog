@@ -6,7 +6,7 @@
       <i class="dropdown icon"></i>
       <div class="default text">Find a user to follow...</div>
       <div class="menu">
-        <div class="item" @click="setUserToFollow(user.username)" :key="user.username" v-for="user in allUsers" v-if="user.username!=currentUser.username">
+        <div class="item" @click="setUserToFollow(user.username)" :key="user.username" v-for="user in allUsers" v-if="user.username !== currentUser.username">
           <span class="text">{{user.username}}</span>
         </div>
       </div>
@@ -23,56 +23,58 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import toastr from 'toastr';
+import Vue from 'vue'
+import toastr from 'toastr'
 import 'toastr/build/toastr.css'
-import moment from 'moment';
-import Post from '@/components/Post.vue';
-import $ from 'jquery';
+import moment from 'moment'
+import Post from '@/components/Post.vue'
+import $ from 'jquery'
 
 export default Vue.extend({
   name: 'Dashboard',
   props: {},
   components: {
-    Post,
+    Post
   },
   data() {
     return {
       moment: moment,
       followedUsers: null,
       posts: null,
-      userToFollow: null,
+      userToFollow: null
     }
   },
   computed: {
     allUsers() {
-      return this.$store.state.allUsers;
+      return this.$store.state.allUsers
     },
     currentUser() {
-      return this.$store.state.currentUser;
+      return this.$store.state.currentUser
     },
     followedUsersNames() {
-      var result = [];
-      for (var user in this.followedUsers)
+      var result = []
+      for (var user in this.followedUsers) {
         result.push(this.followedUsers[user].user)
+      }
       return result
     },
     followedUsersDates() {
-      var result = {};
-      for (var user in this.followedUsers)
+      var result = {}
+      for (var user in this.followedUsers) {
         Vue.set(result, this.followedUsers[user].user, this.followedUsers[user].sinceDate)
+      }
       return result
-    },
+    }
   },
   filters: {},
   methods: {
     setUserToFollow(user) {
-      this.userToFollow = user;
+      this.userToFollow = user
     },
     getFollowedUsers() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/getFollowedUsers.php?user=${this.currentUser.username}`, {
-        //credentials: 'include'
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/getFollowedUsers.php?user=${this.currentUser.username}`, {
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
           return response.json()
@@ -80,7 +82,7 @@ export default Vue.extend({
           return Promise.reject(new Error('Failed getting followed users.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
+        toastr.options.preventDuplicates = true
         toastr.error('Unable to fetch followed users. Try reloading', 'ERROR')
         return Promise.reject(reason)
       }).then(data => {
@@ -90,8 +92,8 @@ export default Vue.extend({
     },
     getPostsFromFollowedUsers() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/getPostsFromFollowedUsers.php?user=${this.currentUser.username}`, {
-        //credentials: 'include'
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/getPostsFromFollowedUsers.php?user=${this.currentUser.username}`, {
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
           return response.json()
@@ -99,7 +101,7 @@ export default Vue.extend({
           return Promise.reject(new Error('Failed getting posts.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
+        toastr.options.preventDuplicates = true
         toastr.error('Unable to fetch user posts. Try reloading', 'ERROR')
         return Promise.reject(reason)
       }).then(data => {
@@ -109,69 +111,70 @@ export default Vue.extend({
     },
     followUser() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/followUser.php?user1=${this.currentUser.username}&user2=${this.userToFollow}`, {
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/followUser.php?user1=${this.currentUser.username}&user2=${this.userToFollow}`, {
         method: 'POST',
-        //credentials: 'include',
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
-          return response.json();
+          return response.json()
         } else {
-          return Promise.reject(new Error('Failed following user.'));
+          return Promise.reject(new Error('Failed following user.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
-        toastr.error('Failed following user', 'ERROR');
-        return Promise.reject(reason);
+        toastr.options.preventDuplicates = true
+        toastr.error('Failed following user', 'ERROR')
+        return Promise.reject(reason)
       }).then(data => {
         if (data) {
-          toastr.options.preventDuplicates = true;
-          toastr.success('Started following user.', 'SUCCESS');
-          vm.getFollowedUsers();
-          vm.getPostsFromFollowedUsers();
+          toastr.options.preventDuplicates = true
+          toastr.success('Started following user.', 'SUCCESS')
+          vm.getFollowedUsers()
+          vm.getPostsFromFollowedUsers()
         }
-        return data;
-      });
+        return data
+      })
     },
     unfollowUser() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/unfollowUser.php?user1=${this.currentUser.username}&user2=${this.userToFollow}`, {
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/followings/unfollowUser.php?user1=${this.currentUser.username}&user2=${this.userToFollow}`, {
         method: 'DELETE',
-        //credentials: 'include',
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
-          return response.json();
+          return response.json()
         } else {
-          return Promise.reject(new Error('Failed unfollowing user.'));
+          return Promise.reject(new Error('Failed unfollowing user.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
-        toastr.error('Failed unfollowing user', 'ERROR');
-        return Promise.reject(reason);
+        toastr.options.preventDuplicates = true
+        toastr.error('Failed unfollowing user', 'ERROR')
+        return Promise.reject(reason)
       }).then(data => {
         if (data) {
-          toastr.options.preventDuplicates = true;
-          toastr.success('Stopped following user.', 'SUCCESS');
-          vm.getFollowedUsers();
-          vm.getPostsFromFollowedUsers();
+          toastr.options.preventDuplicates = true
+          toastr.success('Stopped following user.', 'SUCCESS')
+          vm.getFollowedUsers()
+          vm.getPostsFromFollowedUsers()
         }
-        return data;
-      });
-    },
+        return data
+      })
+    }
   },
   mounted() {
-    if (!this.currentUser)
-      window.location.href = "http://localhost:8081/finki_blog/"
+    if (!this.currentUser) {
+      window.location.href = 'https://localhost/finki_blog/'
+    }
     $(this.$refs.followingDropdown).dropdown()
     this.getFollowedUsers()
     this.getPostsFromFollowedUsers()
   },
   beforeRouteUpdate(to, from, next) {
-    if (to.params.user != this.currentUser.username) {
-      toastr.options.preventDuplicates = true;
-      toastr.error('Don\'t even think about doing that.', 'ERROR');
-    } else next();
-  },
-});
+    if (to.params.user !== this.currentUser.username) {
+      toastr.options.preventDuplicates = true
+      toastr.error('Don\'t even think about doing that.', 'ERROR')
+    } else next()
+  }
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

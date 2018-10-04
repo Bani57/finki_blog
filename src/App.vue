@@ -6,18 +6,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import NavBar from '@/components/NavBar.vue'; // @ is an alias to /src
+import Vue from 'vue'
+import NavBar from '@/components/NavBar.vue' // @ is an alias to /src
 
 export default Vue.extend({
   name: 'App',
   components: {
-    NavBar,
+    NavBar
   },
-  mounted() {
+  mounted () {
     this.$store.dispatch('getAllUsers')
-  },
-});
+  }
+})
 </script>
 
 <style >

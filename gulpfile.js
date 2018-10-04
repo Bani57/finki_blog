@@ -8,7 +8,7 @@ const testing = {
   frontendBasePath: '/finki_blog/',
   backendBasePath: '/finki_blog/backend/',
   destDir: `/var/www/html/finki_blog`,
-  database: 'blog',
+  database: 'blog'
 }
 
 const dev = {
@@ -16,7 +16,7 @@ const dev = {
   frontendBasePath: '/finki_blog/',
   backendBasePath: '/finki_blog/backend/',
   destDir: `/var/www/html/finki_blog`,
-  database: 'blog',
+  database: 'blog'
 }
 
 const production = {
@@ -24,7 +24,7 @@ const production = {
   frontendBasePath: '/finki_blog/',
   backendBasePath: '/finki_blog/backend/',
   destDir: `/var/www/html/finki_blog`,
-  database: 'blog',
+  database: 'blog'
 }
 
 const srcDir = '.'
@@ -65,7 +65,7 @@ gulp.task('clear-frontend-testing', () => {
   //   `${testing.destDir}/static`,
   //   `${testing.destDir}/index.html`
   // ], { force: true });
-});
+})
 
 /**
  * @description Deploy frontend to testing server.
@@ -73,15 +73,15 @@ gulp.task('clear-frontend-testing', () => {
 gulp.task('deploy-frontend-testing', ['clear-frontend-testing'], () => {
   return gulp
     .src(`${srcDir}/vue/dist/**/*`)
-    .pipe(gulp.dest(`${testing.destDir}/`));
-});
+    .pipe(gulp.dest(`${testing.destDir}/`))
+})
 
 /**
  * @description Remove current backend from testing server.
  */
 gulp.task('clear-backend-testing', () => {
   // return del(`${testing.destDir}/backend/**`, { force: true });
-});
+})
 
 /**
  * @description Deploy backend to testing server.
@@ -90,8 +90,8 @@ gulp.task('deploy-backend-testing', ['clear-backend-testing'], () => {
   return gulp
     .src(`${srcDir}/backend/**`)
     .pipe(replace(databaseMarker, testing.database))
-    .pipe(gulp.dest(`${testing.destDir}/backend/`));
-});
+    .pipe(gulp.dest(`${testing.destDir}/backend/`))
+})
 
 /**
  * @description Build and deploy documentation to testing server.
@@ -100,8 +100,8 @@ gulp.task('deploy-docs-testing', () => {
   return gulp
     .src(`${srcDir}/docs/**`)
     .pipe(replace(docsHostMarker, testing.host))
-    .pipe(gulp.dest(`${testing.destDir}/docs/`));
-});
+    .pipe(gulp.dest(`${testing.destDir}/docs/`))
+})
 
 // --------------- DEPLOY TO DEV ---------------
 
@@ -114,8 +114,8 @@ gulp.task('clear-frontend-dev', () => {
     `${dev.destDir}/index.html`
   ], {
     force: true
-  });
-});
+  })
+})
 
 /**
  * @description Deploy frontend to dev server.
@@ -123,8 +123,8 @@ gulp.task('clear-frontend-dev', () => {
 gulp.task('deploy-frontend-dev', ['clear-frontend-dev'], () => {
   return gulp
     .src(`${srcDir}/vue/dist/**/*`)
-    .pipe(gulp.dest(`${dev.destDir}/`));
-});
+    .pipe(gulp.dest(`${dev.destDir}/`))
+})
 
 /**
  * @description Remove current backend from dev server.
@@ -132,8 +132,8 @@ gulp.task('deploy-frontend-dev', ['clear-frontend-dev'], () => {
 gulp.task('clear-backend-dev', () => {
   return del(`${testing.destDir}/backend/**`, {
     force: true
-  });
-});
+  })
+})
 
 /**
  * @description Deploy backend to dev server.
@@ -142,8 +142,8 @@ gulp.task('deploy-backend-dev', ['clear-backend-dev'], () => {
   return gulp
     .src(`${srcDir}/backend/**`)
     .pipe(replace(databaseMarker, dev.database))
-    .pipe(gulp.dest(`${dev.destDir}/backend/`));
-});
+    .pipe(gulp.dest(`${dev.destDir}/backend/`))
+})
 
 /**
  * @description Build and deploy documentation to testing server.
@@ -152,8 +152,8 @@ gulp.task('deploy-docs-dev', () => {
   return gulp
     .src(`${srcDir}/docs/**`)
     .pipe(replace(docsHostMarker, dev.host))
-    .pipe(gulp.dest(`${dev.destDir}/docs/`));
-});
+    .pipe(gulp.dest(`${dev.destDir}/docs/`))
+})
 
 // --------------- DEPLOY TO PRODUCTION ---------------
 
@@ -166,8 +166,8 @@ gulp.task('clear-frontend-production', () => {
     `${production.destDir}/index.html`
   ], {
     force: true
-  });
-});
+  })
+})
 
 /**
  * @description Deploy frontend to production server.
@@ -175,8 +175,8 @@ gulp.task('clear-frontend-production', () => {
 gulp.task('deploy-frontend-production', ['clear-frontend-production'], () => {
   return gulp
     .src(`${srcDir}/vue/dist/**/*`)
-    .pipe(gulp.dest(`${production.destDir}/`));
-});
+    .pipe(gulp.dest(`${production.destDir}/`))
+})
 
 /**
  * @description Remove current backend from production server.
@@ -184,8 +184,8 @@ gulp.task('deploy-frontend-production', ['clear-frontend-production'], () => {
 gulp.task('clear-backend-production', () => {
   return del(`${production.destDir}/backend/**`, {
     force: true
-  });
-});
+  })
+})
 
 /**
  * @description Deploy backend to production server.
@@ -195,8 +195,8 @@ gulp.task('deploy-backend-to-production', ['clear-backend-production'], () => {
     .src(`${srcDir}/backend/**`)
     .pipe(replace(databaseMarker, production.database))
     .pipe(replace(docsHostMarker, production.host))
-    .pipe(gulp.dest(`${production.destDir}/backend/`));
-});
+    .pipe(gulp.dest(`${production.destDir}/backend/`))
+})
 
 /**
  * @description Build and deploy documentation to production server.
@@ -205,5 +205,5 @@ gulp.task('deploy-docs-production', () => {
   return gulp
     .src(`${srcDir}/docs/**`)
     .pipe(replace(docsHostMarker, production.host))
-    .pipe(gulp.dest(`${production.destDir}/docs/`));
-});
+    .pipe(gulp.dest(`${production.destDir}/docs/`))
+})

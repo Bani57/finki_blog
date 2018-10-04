@@ -52,17 +52,17 @@
           <Comment @commentDeleted="getCommentsFromPost()" v-for="comment in comments" :key="comment.date" :author="comment.user" :post="comment.post" :content="comment.content" :date="comment.date" :likes="comment.likes"></Comment>
     </div>
   </div>
-  <div class="ui left aligned grey segment" v-if="this.author==currentUser.username">
+  <div class="ui left aligned grey segment" v-if="this.author === currentUser.username">
     <button class="ui button" @click="deletePost()">Delete post</button>
   </div>
 </div>
 </template>
 
 <script lang="ts">
-import moment from 'moment';
-import toastr from 'toastr';
-import $ from 'jquery';
-import Comment from '@/components/Comment.vue';
+import moment from 'moment'
+import toastr from 'toastr'
+import $ from 'jquery'
+import Comment from '@/components/Comment.vue'
 
 $(document).ready(function() {
   $('.ui.comment.form')
@@ -79,16 +79,16 @@ $(document).ready(function() {
               prompt: 'Sorry, your comment is too long.'
             }
           ]
-        },
+        }
       },
       onSuccess: function(event) {
-        event.preventDefault();
+        event.preventDefault()
       }
-    });
+    })
   $('.no-sticky-animation').on('mousedown', function(event) {
-    event.preventDefault();
-  });
-});
+    event.preventDefault()
+  })
+})
 
 export default {
   name: 'Post',
@@ -98,7 +98,7 @@ export default {
     title: String,
     content: String,
     date: String,
-    likes: Number,
+    likes: Number
   },
   data() {
     return {
@@ -136,7 +136,7 @@ export default {
           return Promise.reject(new Error('Failed getting comments.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
+        toastr.options.preventDuplicates = true
         toastr.error('Unable to fetch comments. Try reloading', 'ERROR')
         return Promise.reject(reason)
       }).then(data => {
@@ -146,38 +146,39 @@ export default {
     },
     setUserImage() {
       var images = require.context('@/assets/', true)
-      if (this.authorAccount && this.authorAccount.picture)
-        return images('./users/' + this.authorAccount.picture)
-      else return images('./user.png')
+      if (this.authorAccount && this.authorAccount.picture) {
+        return '/finki_blog/img/' + this.authorAccount.picture
+      } else return images('./user.png')
     },
     setDateDisplay(relative) {
-      if (relative)
-        this.dateDisplay = moment(this.date).fromNow();
-      else
-        this.dateDisplay = moment(this.date).format("DD MMMM YYYY HH:mm:ss");
+      if (relative) {
+        this.dateDisplay = moment(this.date).fromNow()
+      } else {
+        this.dateDisplay = moment(this.date).format('DD MMMM YYYY HH:mm:ss')
+      }
     },
     updatePostLikes(amount) {
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/updatePostLikes.php?id=${this.id}&amount=${amount}`, {
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/updatePostLikes.php?id=${this.id}&amount=${amount}`, {
         method: 'PATCH',
-        //credentials: 'include',
+        credentials: 'include'
       }).then((response) => {
         if (response.ok) {
-          return response.json();
+          return response.json()
         } else {
-          return Promise.reject(new Error('Failed updating likes.'));
+          return Promise.reject(new Error('Failed updating likes.'))
         }
       }, (reason) => {
-        toastr.options.preventDuplicates = true;
-        toastr.error('Failed updating likes.', 'ERROR');
-        return Promise.reject(reason);
+        toastr.options.preventDuplicates = true
+        toastr.error('Failed updating likes.', 'ERROR')
+        return Promise.reject(reason)
       }).then((data) => {
         if (data) {
-          toastr.options.preventDuplicates = true;
-          toastr.success('Likes updated.', 'SUCCESS');
-          this.$emit('postDeleted');
+          toastr.options.preventDuplicates = true
+          toastr.success('Likes updated.', 'SUCCESS')
+          this.$emit('postDeleted')
         }
-        return data;
-      });
+        return data
+      })
     },
     likePost() {
       if (!this.liked) {
@@ -189,12 +190,14 @@ export default {
       }
     },
     refreshAccordion() {
-      $(this.$refs.commentsAccordion).accordion('refresh');
+      $(this.$refs.commentsAccordion).accordion('refresh')
+      $(this.$refs.signatureAccordion).accordion('refresh')
     },
     setContentRows() {
       var newLines = 0
-      if (this.commentContent)
+      if (this.commentContent) {
         newLines = this.commentContent.split('\n').length - 1
+      }
       return newLines + 1
     },
     addComment() {
@@ -204,66 +207,67 @@ export default {
           post: this.id,
           content: this.commentContent
         }
-        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/addComment.php`, {
+        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/addComment.php`, {
           method: 'POST',
           body: JSON.stringify(comment),
-          //credentials: 'include',
+          credentials: 'include'
         }).then((response) => {
           if (response.ok) {
-            return response.json();
+            return response.json()
           } else {
-            return Promise.reject(new Error('Failed adding new comment on post.'));
+            return Promise.reject(new Error('Failed adding new comment on post.'))
           }
         }, (reason) => {
-          toastr.options.preventDuplicates = true;
-          toastr.error('Failed adding new comment on post.', 'ERROR');
-          return Promise.reject(reason);
+          toastr.options.preventDuplicates = true
+          toastr.error('Failed adding new comment on post.', 'ERROR')
+          return Promise.reject(reason)
         }).then((data) => {
           if (data) {
-            toastr.options.preventDuplicates = true;
-            toastr.success('Comment added.', 'SUCCESS');
-            this.clearCommentFields();
-            this.getCommentsFromPost();
+            toastr.options.preventDuplicates = true
+            toastr.success('Comment added.', 'SUCCESS')
+            this.clearCommentFields()
+            this.getCommentsFromPost()
           }
-          return data;
-        });
+          return data
+        })
       }
     },
     clearCommentFields() {
       this.commentContent = null
     },
     deletePost() {
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/deletePost.php?id=${this.id}`, {
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/deletePost.php?id=${this.id}`, {
         method: 'DELETE',
-        //credentials: 'include',
+        credentials: 'include'
       }).then((response) => {
         if (response.ok) {
-          return response.json();
+          return response.json()
         } else {
-          return Promise.reject(new Error('Failed deleting post.'));
+          return Promise.reject(new Error('Failed deleting post.'))
         }
       }, (reason) => {
-        toastr.options.preventDuplicates = true;
-        toastr.error('Failed deleting post.', 'ERROR');
-        return Promise.reject(reason);
+        toastr.options.preventDuplicates = true
+        toastr.error('Failed deleting post.', 'ERROR')
+        return Promise.reject(reason)
       }).then((data) => {
         if (data) {
-          toastr.options.preventDuplicates = true;
-          toastr.success('Post deleted.', 'SUCCESS');
-          this.$emit('postDeleted');
+          toastr.options.preventDuplicates = true
+          toastr.success('Post deleted.', 'SUCCESS')
+          this.$emit('postDeleted')
         }
-        return data;
-      });
-    },
+        return data
+      })
+    }
   },
   mounted() {
-    $(this.$refs.commentsAccordion).accordion('refresh');
+    $(this.$refs.commentsAccordion).accordion('refresh')
+    $(this.$refs.signatureAccordion).accordion('refresh')
     let vm = this
-    if (this.$store.state.allUsers[this.author])
+    if (this.$store.state.allUsers[this.author]) {
       this.authorAccount = this.$store.state.allUsers[this.author]
-    else {
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.author}`, {
-        //credentials: 'include'
+    } else {
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.author}`, {
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
           return response.json()
@@ -271,7 +275,7 @@ export default {
           return Promise.reject(new Error('Failed getting user.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
+        toastr.options.preventDuplicates = true
         toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
         return Promise.reject(reason)
       }).then(data => {

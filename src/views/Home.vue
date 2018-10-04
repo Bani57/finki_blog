@@ -105,7 +105,6 @@
     </div>
   </div>
 
-
   <div class="ui footer segments">
     <div class="ui vertical segment">
       <div>
@@ -127,11 +126,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import $ from 'jquery';
-import toastr from 'toastr';
+import Vue from 'vue'
+import $ from 'jquery'
+import toastr from 'toastr'
 import 'toastr/build/toastr.css'
-import sjcl from 'sjcl';
+import sjcl from 'sjcl'
 
 $(document).ready(function() {
   $('.ui.login.form')
@@ -162,12 +161,12 @@ $(document).ready(function() {
             type: 'empty',
             prompt: 'Sorry, the username is not correct.'
           }]
-        },
+        }
       },
       onSuccess: function(event) {
-        event.preventDefault();
+        event.preventDefault()
       }
-    });
+    })
   $('.ui.register.form')
     .form({
       fields: {
@@ -221,14 +220,13 @@ $(document).ready(function() {
 
       },
       onSuccess: function(event) {
-        event.preventDefault();
+        event.preventDefault()
       }
-    });
+    })
   $('.no-sticky-animation').on('mousedown', function(event) {
-    event.preventDefault();
-  });
-});
-
+    event.preventDefault()
+  })
+})
 
 export default Vue.extend({
   name: 'Home',
@@ -242,60 +240,67 @@ export default Vue.extend({
       passwordRegistration: null,
       firstName: null,
       lastName: null,
-      email: "username@example.com",
+      email: 'username@example.com',
       pictureName: null,
+      image: null,
       correctUsername: null,
-      correctPasswordHash: null,
+      correctPasswordHash: null
     }
   },
   computed: {
     currentUser() {
-      return this.$store.state.currentUser;
+      return this.$store.state.currentUser
     },
     validLogin() {
       let vm = this
       if (vm.$store.state.allUsers[this.username]) {
         vm.correctUsername = vm.$store.state.allUsers[this.username].username
         vm.correctPasswordHash = vm.$store.state.allUsers[this.username].password
-      } else {
-        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.username}`, {
-          //credentials: 'include'
-        }).then(response => {
-          if (response.ok) {
-            return response.json()
-          } else {
-            return Promise.reject(new Error('Failed getting user'))
-          }
-        }, reason => {
-          toastr.options.preventDuplicates = true;
-          toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
-          return Promise.reject(reason)
-        }).then(data => {
-          if (data) {
-            vm.correctUsername = data.username
-            vm.correctPasswordHash = data.password
-          }
-          return data
-        })
-      }
-      return this.username && this.password && vm.correctUsername == vm.username && vm.correctPasswordHash == vm.passwordHash(vm.password)
+      } else vm.getUserByUsername()
+      return this.username && this.password && vm.correctUsername === vm.username && vm.correctPasswordHash === vm.passwordHash(vm.password)
     },
     validRegistration() {
       var valid = this.usernameRegistration && this.passwordRegistration
-      if (this.firstName)
+      if (this.firstName) {
         valid = valid && this.firstName.length <= 20
-      if (this.lastName)
+      }
+      if (this.lastName) {
         valid = valid && this.lastName.length <= 30
+      }
       var re = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
-      if (this.email)
+      if (this.email) {
         valid = valid && re.test(this.email)
-      if (this.pictureName)
+      }
+      if (this.pictureName) {
         valid = valid && this.pictureName.length <= 100
+      }
       return valid
     }
   },
   filters: {},
   methods: {
+    getUserByUsername() {
+      let vm = this
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/getUserByUsername.php?username=${this.username}`, {
+        credentials: 'include'
+      }).then(response => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          return Promise.reject(new Error('Failed getting user'))
+        }
+      }, reason => {
+        toastr.options.preventDuplicates = true
+        toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
+        return Promise.reject(reason)
+      }).then(data => {
+        if (data) {
+          vm.correctUsername = data.username
+          vm.correctPasswordHash = data.password
+        }
+        return data
+      })
+    },
     passwordHash(password) {
       var hasher = new sjcl.hash.sha256()
       hasher.update(password)
@@ -414,16 +419,16 @@ export default Vue.extend({
       this.passwordRegistration = null
       this.firstName = null
       this.lastName = null
-      this.email = "username@example.com"
+      this.email = 'username@example.com'
       this.pictureName = null
-    },
+    }
   },
   beforeDestroy: function() {
-    $(this.$refs.loginModal).modal('hide');
-    $(this.$refs.registerModal).modal('hide');
-    $(this.$refs.deleteAccountModal).modal('hide');
-  },
-});
+    $(this.$refs.loginModal).modal('hide')
+    $(this.$refs.registerModal).modal('hide')
+    $(this.$refs.deleteAccountModal).modal('hide')
+  }
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

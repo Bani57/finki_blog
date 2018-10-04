@@ -56,16 +56,16 @@ export default new Vuex.Store({
             return Promise.reject(new Error('Failed getting user'))
           }
         }, reason => {
-          toastr.options.preventDuplicates = true;
+          toastr.options.preventDuplicates = true
           toastr.error('Unable to fetch user account details. Try reloading', 'ERROR')
           return Promise.reject(reason)
         }).then(data => {
           if (data) {
-            commit(SET_CURRENT_USER, data);
+            commit(SET_CURRENT_USER, data)
           }
           return data
         })
       }
-    },
+    }
   }
 })

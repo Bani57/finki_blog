@@ -30,13 +30,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import toastr from 'toastr';
+import Vue from 'vue'
+import toastr from 'toastr'
 import 'toastr/build/toastr.css'
-import $ from 'jquery';
-import Post from '@/components/Post.vue';
-import moment from 'moment';
-import myCaptcha from 'vue-captcha';
+import $ from 'jquery'
+import Post from '@/components/Post.vue'
+import moment from 'moment'
+import myCaptcha from 'vue-captcha'
 
 $(document).ready(function() {
   $('.ui.post.form')
@@ -75,20 +75,20 @@ $(document).ready(function() {
         }
       },
       onSuccess: function(event) {
-        event.preventDefault();
+        event.preventDefault()
       }
-    });
+    })
   $('.no-sticky-animation').on('mousedown', function(event) {
-    event.preventDefault();
-  });
-});
+    event.preventDefault()
+  })
+})
 
 export default Vue.extend({
   name: 'MyPosts',
   props: {},
   components: {
     Post,
-    myCaptcha,
+    myCaptcha
   },
   data() {
     return {
@@ -96,28 +96,30 @@ export default Vue.extend({
       title: null,
       content: null,
       posts: null,
-      captchaCorrect: null,
+      captchaCorrect: null
     }
   },
   computed: {
     validPost() {
       var valid = this.title && this.content && this.captchaCorrect
-      if (this.title)
+      if (this.title) {
         valid = valid && this.title.length <= 50
-      if (this.content)
+      }
+      if (this.content) {
         valid = valid && this.content.length <= 2000
+      }
       return valid
     },
     currentUser() {
-      return this.$store.state.currentUser;
+      return this.$store.state.currentUser
     }
   },
   filters: {},
   methods: {
     getPostsFromUser() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/getPostsFromUser.php?author=${this.currentUser.username}`, {
-        //credentials: 'include'
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/getPostsFromUser.php?author=${this.currentUser.username}`, {
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
           return response.json()
@@ -125,7 +127,7 @@ export default Vue.extend({
           return Promise.reject(new Error('Failed getting posts.'))
         }
       }, reason => {
-        toastr.options.preventDuplicates = true;
+        toastr.options.preventDuplicates = true
         toastr.error('Unable to fetch user posts. Try reloading', 'ERROR')
         return Promise.reject(reason)
       }).then(data => {
@@ -185,17 +187,18 @@ export default Vue.extend({
     }
   },
   mounted() {
-    if (!this.currentUser)
-      window.location.href = "http://localhost:8081/finki_blog/"
+    if (!this.currentUser) {
+      window.location.href = 'https://localhost/finki_blog/'
+    }
     this.getPostsFromUser()
   },
   beforeRouteUpdate(to, from, next) {
-    if (to.params.user != this.currentUser.username) {
-      toastr.options.preventDuplicates = true;
-      toastr.error('Don\'t even think about doing that.', 'ERROR');
-    } else next();
-  },
-});
+    if (to.params.user !== this.currentUser.username) {
+      toastr.options.preventDuplicates = true
+      toastr.error('Don\'t even think about doing that.', 'ERROR')
+    } else next()
+  }
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
