@@ -137,39 +137,41 @@ export default Vue.extend({
     },
     setContentRows() {
       var newLines = 0
-      if (this.content)
+      if (this.content) {
         newLines = this.content.split('\n').length - 1
+      }
       return newLines + 1
     },
     makePost() {
       if (this.validPost) {
         var post = {
           title: this.title,
-          content: this.content
+          content: this.content,
+          userPass: this.currentUser.password
         }
-        fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/addPost.php?username=${this.currentUser.username}`, {
+        fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/posts/addPost.php?username=${this.currentUser.username}`, {
           method: 'POST',
           body: JSON.stringify(post),
-          //credentials: 'include',
+          credentials: 'include'
         }).then((response) => {
           if (response.ok) {
-            return response.json();
+            return response.json()
           } else {
-            return Promise.reject(new Error('Failed adding new post.'));
+            return Promise.reject(new Error('Failed adding new post.'))
           }
         }, (reason) => {
-          toastr.options.preventDuplicates = true;
-          toastr.error('Failed adding new post.', 'ERROR');
-          return Promise.reject(reason);
+          toastr.options.preventDuplicates = true
+          toastr.error('Failed adding new post.', 'ERROR')
+          return Promise.reject(reason)
         }).then((data) => {
           if (data) {
-            toastr.options.preventDuplicates = true;
-            toastr.success('Post created.', 'SUCCESS');
-            this.clearPostFields();
-            this.getPostsFromUser();
+            toastr.options.preventDuplicates = true
+            toastr.success('Post created.', 'SUCCESS')
+            this.clearPostFields()
+            this.getPostsFromUser()
           }
-          return data;
-        });
+          return data
+        })
       }
     },
     clearPostFields() {

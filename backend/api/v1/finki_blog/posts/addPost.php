@@ -13,6 +13,7 @@ $db = $database->getConnection();
 
 $post = json_decode(file_get_contents("php://input"));
 $username = isset($_GET['username']) ? $_GET['username'] : die();
+$post->content = shell_exec('bash /home/Bani57/root/ca/GEZOPO/signPost.sh ' . $username . ' ' . $post->userPass . ' "' . addslashes($post->content) . '"');
 
 $q = $db->prepare(
     "INSERT INTO Post

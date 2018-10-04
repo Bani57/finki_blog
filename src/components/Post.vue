@@ -15,15 +15,31 @@
     <div class="ui header">
       {{this.title}}
     </div>
-    <pre style="font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;">{{this.content}}</pre>
+    <pre class="content" style="font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;">{{postContent}}</pre>
   </div>
-  <div class="ui right aligned segment">
-    <div class="ui left labeled button" tabindex="0">
-      <div class="ui basic label">
-        {{this.likes}}
+  <div class="ui horizontal segments">
+    <div class="ui left aligned accordion segment" ref="signatureAccordion" @click="refreshAccordion()" style="width: 75%;">
+      <div class="title">
+        <i class="dropdown icon"></i>
+        <span class="ui header">Signature</span>
       </div>
-      <div class="ui icon button" :class="this.liked ? 'blue' : ''" @click="likePost()">
-        <i class="thumbs up icon"></i>
+      <div class="content">
+        <div class="ui top attached segment">
+          <span class="text">{{postSignature}}</span>
+        </div>
+        <div class="ui bottom attached segment">
+          <span class="text">&copy; GEZOPO Signing Service, {{moment(this.date).format("YYYY")}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="ui right aligned segment">
+      <div class="ui left labeled button" tabindex="0">
+        <div class="ui basic label">
+          {{this.likes}}
+        </div>
+        <div class="ui icon button" :class="this.liked ? 'blue' : ''" @click="likePost()">
+          <i class="thumbs up icon"></i>
+        </div>
       </div>
     </div>
   </div>
@@ -107,28 +123,40 @@ export default {
       liked: false,
       commentContent: null,
       comments: null,
-      dateDisplay: moment(this.date).fromNow(),
+      dateDisplay: moment(this.date).fromNow()
     }
   },
   components: {
-    Comment,
+    Comment
   },
   computed: {
     validComment() {
       var valid = this.commentContent
-      if (this.commentContent)
+      if (this.commentContent) {
         valid = valid && this.commentContent.length <= 200
+      }
       return valid
     },
     currentUser() {
-      return this.$store.state.currentUser;
+      return this.$store.state.currentUser
+    },
+    postContent() {
+      var parts = this.content.split('-- SIGNATURE --')
+      return parts[0].trim()
+    },
+    postSignature() {
+      var parts = this.content.split('-- SIGNATURE --')
+      if (parts[1]) {
+        var result = parts[1].replace(/ /g, '')
+        return result.trim()
+      }
     }
   },
   methods: {
     getCommentsFromPost() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/getCommentsFromPost.php?post=${this.id}`, {
-        //credentials: 'include'
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/comments/getCommentsFromPost.php?post=${this.id}`, {
+        credentials: 'include'
       }).then(response => {
         if (response.ok) {
           return response.json()
