@@ -2,7 +2,7 @@
 <div class="ui segments">
   <div class="ui left aligned red segment">
     <div class="ui header">
-      <img class="ui circular image" :src="setUserImage()" style="width: 3em; height: 3em;" />
+      <img class="ui circular image" :src="setUserImage()" />
       <div class="content">
         {{this.author}}
         <div class="sub header" @mouseover="setDateDisplay(false)" @mouseleave="setDateDisplay(true)">
