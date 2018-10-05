@@ -20,6 +20,7 @@ $q->bindParam(":id", $id, PDO::PARAM_STR, 30);
 if ($q->execute()) {
     echo json_encode(true);
 } else {
+  http_response_code(500);
     echo json_encode(
    array('message' => 'Error while deleting post.', 'error' => $q->errorInfo() )
 );

@@ -20,6 +20,7 @@ $q->bindParam(":author", $author, PDO::PARAM_STR, 30);
 if ($q->execute()) {
     echo json_encode($q->fetchAll(PDO::FETCH_ASSOC));
 } else {
+  http_response_code(500);
     echo json_encode(
    array('message' => 'Error while getting posts.', 'error' => $q->errorInfo() )
 );

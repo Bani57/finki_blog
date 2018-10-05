@@ -40,7 +40,9 @@ $q->bindParam(":author", $username, PDO::PARAM_STR, 30);
 if ($q->execute()) {
     echo json_encode($db->lastInsertId());
 } else {
+  http_response_code(500);
     echo json_encode(
  array('message' => 'Error while adding post.', 'error' => $q->errorInfo() )
 );
 }
+?>
