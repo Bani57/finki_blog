@@ -33,6 +33,7 @@
 <script lang="ts">
 import moment from 'moment'
 import toastr from 'toastr'
+import 'toastr/build/toastr.css'
 import $ from 'jquery'
 
 export default {

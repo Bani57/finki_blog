@@ -1,9 +1,9 @@
 <template>
 <div class="home">
   <img src="@/assets/logo.png" class="ui centered medium image">
-  <div v-if="currentUser" style="margin-top: 30px">
+  <div v-show="currentUser" style="margin-top: 30px">
     <div class="ui huge header">
-      {{'Welcome, '+ currentUser.username + '!'}}
+      {{'Welcome, ' + currentUserName + '!'}}
       <div class="sub header" style="margin-top: 20px">Click on <b>My posts</b> to make a new post or see if anyone has commented on your previous posts, or just go to <b>Dashboard</b> to see what others have to say.</div>
     </div>
     <div @click="logout()" class="huge ui blue button" style="margin-top: 50px; margin-right: 50px">
@@ -23,7 +23,7 @@
       </div>
     </div>
   </div>
-  <div v-else style="margin-top: 30px">
+  <div v-show="!currentUser" style="margin-top: 30px">
     <div class="ui huge header">
       Welcome to the FINKI blog site!
       <div class="sub header" style="margin-top: 20px">To proceed please <b>Login</b> if you already have an account or click <b>Register</b> to join the community!</div>
@@ -32,6 +32,7 @@
       Login
     </div>
     <div class="ui modal" ref="loginModal">
+      <i class="close icon"></i>
       <div class="header">
         Login
       </div>
@@ -61,6 +62,7 @@
       Register
     </div>
     <div class="ui modal" ref="registerModal">
+      <i class="close icon"></i>
       <div class="header">
         Register
       </div>
@@ -244,12 +246,16 @@ export default Vue.extend({
       pictureName: null,
       image: null,
       correctUsername: null,
-      correctPasswordHash: null
+      correctPasswordHash: null,
+      currentUserName: ''
     }
   },
   computed: {
     currentUser() {
-      return this.$store.state.currentUser
+      var user = this.$store.state.currentUser
+      if (user)
+        this.currentUserName = user.username
+      return user
     },
     validLogin() {
       let vm = this
@@ -308,61 +314,72 @@ export default Vue.extend({
       return result
     },
     showLoginForm() {
+      $(this.$refs.loginModal).modal('hide')
+      $(this.$refs.registerModal).modal('hide')
+      $(this.$refs.deleteAccountModal).modal('hide')
       $(this.$refs.loginModal).modal({
         inline: true
-      }).modal('show');
+      }).modal('show')
     },
     showRegisterForm() {
+      $(this.$refs.loginModal).modal('hide')
+      $(this.$refs.registerModal).modal('hide')
+      $(this.$refs.deleteAccountModal).modal('hide')
       $(this.$refs.registerModal).modal({
         inline: true
-      }).modal('show');
+      }).modal('show')
     },
     showDeleteAccountModal() {
+      $(this.$refs.loginModal).modal('hide')
+      $(this.$refs.registerModal).modal('hide')
+      $(this.$refs.deleteAccountModal).modal('hide')
       let vm = this
       $(this.$refs.deleteAccountModal).modal({
         inline: true,
+        closable: false,
         onApprove: function() {
           vm.deleteUser()
         }
-      }).modal('show');
+      }).modal('show')
     },
     login() {
       if (this.validLogin) {
-        this.$store.dispatch('setCurrentUser', this.username); // Final command before complete login.
-        $(this.$refs.loginModal).modal('hide');
-        this.clearLoginFields();
-        toastr.options.preventDuplicates = true;
-        toastr.success('You are now logged in!', 'SUCCESS');
+        this.$store.dispatch('setCurrentUser', this.username) // Final command before complete login.
+        $(this.$refs.loginModal).modal('hide')
+        this.clearLoginFields()
+        toastr.options.preventDuplicates = true
+        toastr.success('You are now logged in!', 'SUCCESS')
       }
     },
     logout() {
-      this.$store.commit('SET_CURRENT_USER', null);
-      toastr.options.preventDuplicates = true;
-      toastr.success('Logout successful. Bye bye!', 'SUCCESS');
+      this.$store.commit('SET_CURRENT_USER', null)
+      toastr.options.preventDuplicates = true
+      toastr.success('Logout successful. Bye bye!', 'SUCCESS')
     },
     deleteUser() {
       let vm = this
-      fetch(`http://${process.env.VUE_APP_HOST}:8080${process.env.BASE_URL}${process.env.VUE_APP_API}/users/deleteUser.php?username=${this.currentUser.username}`, {
+      fetch(`https://${process.env.VUE_APP_HOST}${process.env.BASE_URL}${process.env.VUE_APP_API}/users/deleteUser.php?username=${this.currentUser.username}`, {
         method: 'DELETE',
-        //credentials: 'include',
+        credentials: 'include'
       }).then((response) => {
         if (response.ok) {
-          return response.json();
+          return response.json()
         } else {
-          return Promise.reject(new Error('Failed deleting user account.'));
+          return Promise.reject(new Error('Failed deleting user account.'))
         }
       }, (reason) => {
-        toastr.options.preventDuplicates = true;
-        toastr.error('Failed deleting user account.', 'ERROR');
-        return Promise.reject(reason);
+        toastr.options.preventDuplicates = true
+        toastr.error('Failed deleting user account.', 'ERROR')
+        return Promise.reject(reason)
       }).then((data) => {
         if (data) {
-          toastr.options.preventDuplicates = true;
-          toastr.success('Goodbye ' + vm.currentUser.username + '!', 'SUCCESS');
-          this.$store.commit('SET_CURRENT_USER', null);
+          toastr.options.preventDuplicates = true
+          toastr.success('Goodbye ' + vm.currentUser.username + '!', 'SUCCESS')
+          this.$store.commit('SET_CURRENT_USER', null)
+          $(this.$refs.deleteAccountModal).modal('hide')
         }
-        return data;
-      });
+        return data
+      })
     },
     clearLoginFields() {
       this.username = null
@@ -465,8 +482,8 @@ export default Vue.extend({
 
 @media (min-height: 320px) {
   .footer {
-    position: absolute !important;
-    bottom: 0;
+    position: relative !important;
+    top: 16em;
     width: 100%;
   }
 }
