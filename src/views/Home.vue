@@ -187,9 +187,34 @@ $(document).ready(function() {
         passwordRegistration: {
           identifier: 'passwordRegistration',
           rules: [{
-            type: 'empty',
-            prompt: 'Please enter a password to continue.'
-          }]
+              type: 'empty',
+              prompt: 'Please enter a password to continue.'
+            },
+            {
+              type: 'minLength[8]',
+              prompt: 'Your password must be at least 8 characters long.'
+            },
+            {
+              type: 'regExp',
+              value: /^.*[A-Z].*$/,
+              prompt: 'Your password must contain at least one uppercase letter.'
+            },
+            {
+              type: 'regExp',
+              value: /^.*[a-z].*$/,
+              prompt: 'Your password must contain at least one lowercase letter.'
+            },
+            {
+              type: 'regExp',
+              value: /^.*[0-9].*$/,
+              prompt: 'Your password must contain at least one digit.'
+            },
+            {
+              type: 'regExp',
+              value: /^.*\W.*$/,
+              prompt: 'Your password must contain at least one special character.'
+            },
+          ]
         },
         firstName: {
           identifier: 'firstName',
@@ -207,6 +232,7 @@ $(document).ready(function() {
         },
         email: {
           identifier: 'email',
+          optional: true,
           rules: [{
             type: 'email',
             prompt: 'Please enter a valid email address.'
@@ -242,7 +268,7 @@ export default Vue.extend({
       passwordRegistration: null,
       firstName: null,
       lastName: null,
-      email: 'username@example.com',
+      email: null,
       pictureName: null,
       image: null,
       correctUsername: null,
@@ -395,9 +421,6 @@ export default Vue.extend({
     register() {
       var vm = this
       if (this.validRegistration) {
-        if (this.email === 'username@example.com') {
-          this.email = null
-        }
         var user = {
           username: vm.usernameRegistration,
           password: vm.passwordHash(vm.passwordRegistration),
@@ -424,7 +447,6 @@ export default Vue.extend({
           if (data) {
             toastr.options.preventDuplicates = true
             toastr.success('User account created.', 'SUCCESS')
-            vm.email = 'username@example.com'
           }
           return data
         })
@@ -462,7 +484,7 @@ export default Vue.extend({
       this.passwordRegistration = null
       this.firstName = null
       this.lastName = null
-      this.email = 'username@example.com'
+      this.email = null
       this.pictureName = null
     }
   },
